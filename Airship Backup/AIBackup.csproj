@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
-    <RootNamespace>Airship_Backup</RootNamespace>
+    <RootNamespace>FivePD_AI_Backup</RootNamespace>
     <AssemblyName>BackupMenu.net</AssemblyName>
     <Version>1.0.0</Version>
     <Authors>GGGDunlix</Authors>
