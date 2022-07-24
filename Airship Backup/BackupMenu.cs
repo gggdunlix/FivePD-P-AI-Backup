@@ -29,6 +29,8 @@ namespace BackupMenu
             public Vehicle CopCar, ReqCar;
             public Ped CopPed, DeliveryOfficer;
             public bool isBackupUp;
+
+            Blip CopPedBlip;
             
             MenuItem CancelBackupButtonCode1 = new MenuItem(((string)AIBackupConf["items"]["code1"]["cancelTitle"]), (string)AIBackupConf["items"]["code1"]["cancelDescription"]);
             MenuItem CancelBackupButtonCode2 = new MenuItem(((string)AIBackupConf["items"]["code2"]["cancelTitle"]), (string)AIBackupConf["items"]["code2"]["cancelDescription"]);
@@ -727,7 +729,9 @@ namespace BackupMenu
                 CopPed.MarkAsNoLongerNeeded();
                 CopCar.MarkAsNoLongerNeeded();
                 CopCar.IsSirenActive = false;
-                
+                CopPedBlip.Delete();
+                CopPedBlip.SyncDelete();
+
                 CopPed.AttachedBlip.Delete();
                 Tick -= ContinueCode1AI;
                 isBackupUp = false;
@@ -836,9 +840,10 @@ namespace BackupMenu
                 }
 
                 Debug.Write("\n^2[^4Backup Menu^2] Vehicle Stuff finished, blip time!\n");
-                Blip CopBlip = CopPed.AttachBlip();
-                CopBlip.Sprite = BlipSprite.PoliceOfficer;
-                CopBlip.Scale = 0.5f;
+                CopPedBlip = CopPed.AttachBlip();
+                CopPedBlip.Sprite = BlipSprite.PoliceOfficer;
+                CopPedBlip.Scale = 0.5f;
+               
 
 
                 CopPed.SetIntoVehicle(CopCar, VehicleSeat.Driver);
