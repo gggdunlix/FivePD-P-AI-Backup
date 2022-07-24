@@ -322,8 +322,9 @@ namespace BackupMenu
                             } else if (_item == CancelBackupButtonCode1)
                             {
                                 AIBackup.RemoveMenuItem(CancelBackupButtonCode1);
-                                
-                                await CancelBackup();
+
+                                CancelBackup();
+
                                 AIBackup.AddMenuItem(Code1AI);
                             }
                         };
@@ -726,12 +727,13 @@ namespace BackupMenu
                 CopPed.MarkAsNoLongerNeeded();
                 CopCar.MarkAsNoLongerNeeded();
                 CopCar.IsSirenActive = false;
-                CopPed.Task.WanderAround();
+                
                 CopPed.AttachedBlip.Delete();
                 Tick -= ContinueCode1AI;
                 isBackupUp = false;
-                
-                
+                CopPed.Task.WanderAround();
+
+
             }
 
             public async Task ContinueCode1AI()
@@ -745,37 +747,43 @@ namespace BackupMenu
 
                 float susDistance = ((float)Code1["suspectDistance"]);
                 float speed = ((float)Code1["speed"]);
-
-                if (CopPed.IsAlive || !CopPed.IsDead)
+                if (CopPed.Exists())
                 {
-                    if (CopPed.IsInRangeOf(Game.PlayerPed.Position, susDistance + 10))
+                    if (CopPed.IsAlive || !CopPed.IsDead)
                     {
-                        CopPed.AlwaysKeepTask = false;
-                        CopPed.BlockPermanentEvents = false;
-                        if (CopPed.IsInVehicle())
+                        if (CopPed.IsInRangeOf(Game.PlayerPed.Position, susDistance + 10))
                         {
-                            CopPed.Task.LeaveVehicle();
-                        } else if (!CopPed.IsInVehicle())
-                        {
-                            CopPed.Task.FollowToOffsetFromEntity(Game.PlayerPed, new Vector3(0, 0, 0), -1, susDistance);
-                        }
+                            CopPed.AlwaysKeepTask = false;
+                            CopPed.BlockPermanentEvents = false;
+                            if (CopPed.IsInVehicle())
+                            {
+                                CopPed.Task.LeaveVehicle();
+                            }
+                            else if (!CopPed.IsInVehicle())
+                            {
+                                CopPed.Task.FollowToOffsetFromEntity(Game.PlayerPed, new Vector3(0, 0, 0), -1, susDistance);
+                            }
 
-                    } else
-                    {
-                        CopPed.AlwaysKeepTask = true;
-                        CopPed.BlockPermanentEvents = true;
-                        if (CopPed.IsInVehicle())
-                        {
-                            CopPed.Task.DriveTo(CopCar, Game.PlayerPed.Position, susDistance, speed, ((int)DrivingStyle.SometimesOvertakeTraffic));
                         }
                         else
                         {
-                            CopPed.Task.EnterVehicle(CopCar, VehicleSeat.Driver, -1, 1);
+                            CopPed.AlwaysKeepTask = true;
+                            CopPed.BlockPermanentEvents = true;
+                            if (CopPed.IsInVehicle())
+                            {
+                                CopPed.Task.DriveTo(CopCar, Game.PlayerPed.Position, susDistance, speed);
+                            }
+                            else
+                            {
+                                CopPed.Task.EnterVehicle(CopCar, VehicleSeat.Driver, -1, 1);
+                            }
                         }
                     }
-                } else if (!CopPed.IsAlive || !CopCar.IsAlive || CopPed.IsDead || CopCar.IsDead)
-                {
-                    CancelBackup();
+                    else if (!CopPed.IsAlive || !CopCar.IsAlive || CopPed.IsDead || CopCar.IsDead)
+                    {
+                        Tick -= ContinueCode1AI;
+                        await CancelBackup();
+                    }
                 }
                 
             }
@@ -821,8 +829,7 @@ namespace BackupMenu
 
 
 
-                }
-
+                } 
                 else
                 {
                     CitizenFX.Core.UI.Screen.ShowNotification("Vehicle could not be loaded in time. Try again!");
@@ -841,7 +848,7 @@ namespace BackupMenu
 
                 CopPed.Weapons.Give(WeaponHash.Pistol, 9999, false, true);
                 Debug.Write("\n^2[^4Backup Menu^2] Starting Tasks\n");
-                CopPed.Task.DriveTo(CopCar, location, susDistance, speed, ((int)DrivingStyle.SometimesOvertakeTraffic));
+                CopPed.Task.DriveTo(CopCar, location, susDistance, speed);
 
                 CopPed.RelationshipGroup = Backups;
                 Game.PlayerPed.RelationshipGroup = Backups;
