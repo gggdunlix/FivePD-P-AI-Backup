@@ -742,6 +742,7 @@ namespace BackupMenu
 
             public async Task ContinueCode1AI()
             {
+                await Delay(1000);
                 isBackupUp = true;
                 var configFile = API.LoadResourceFile(API.GetCurrentResourceName(), "config/backup_menu.json");
                 var configJson = JObject.Parse(configFile);
@@ -783,10 +784,11 @@ namespace BackupMenu
                             }
                         }
                     }
-                    else if (!CopPed.IsAlive || !CopCar.IsAlive || CopPed.IsDead || CopCar.IsDead)
+                    else if (!CopPed.IsAlive || !CopCar.IsAlive || CopPed.IsDead || CopCar.IsDead || !CopPed.Exists())
                     {
-                        Tick -= ContinueCode1AI;
                         await CancelBackup();
+                        Tick -= ContinueCode1AI;
+                        
                     }
                 }
                 
@@ -898,6 +900,8 @@ namespace BackupMenu
                 {
                     DeliveryOfficer.Task.DriveTo(ReqCar, Game.PlayerPed.Position, stopDistance, driveSpeed, ((int)DrivingStyle.SometimesOvertakeTraffic));
                 }
+                DeliveryOfficer.AlwaysKeepTask = true;
+                DeliveryOfficer.BlockPermanentEvents = true;
 
 
             }
